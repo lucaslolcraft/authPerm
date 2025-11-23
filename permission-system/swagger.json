@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sistema de Permissionamento API",
+    "description": "API para controle de usuários, grupos e permissões",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/sistemas": {
+      "get": {
+        "summary": "Listar todos os sistemas",
+        "responses": {
+          "200": {
+            "description": "Lista de sistemas"
+          }
+        }
+      },
+      "post": {
+        "summary": "Criar um novo sistema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "example": "Sistema Financeiro"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "example": "Controle de pagamentos"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sistema criado com sucesso"
+          }
+        }
+      }
+    },
+    "/sistemas/{id}": {
+      "get": {
+        "summary": "Buscar sistema por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sistema encontrado"
+          },
+          "404": {
+            "description": "Sistema não encontrado"
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar sistema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string"
+                  },
+                  "descricao": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sistema atualizado"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletar sistema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sistema removido"
+          }
+        }
+      }
+    }
+  }
+}
