@@ -1,130 +1,361 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Sistema de Permissionamento API",
-    "description": "API para controle de usuários, grupos e permissões",
-    "version": "1.0.0"
+    "title": "API - Sistema de Permissionamento",
+    "version": "1.0.0",
+    "description": "API para gerenciamento de usuários, grupos, permissões e sistemas"
   },
+
   "servers": [
-    {
-      "url": "http://localhost:3000"
-    }
+    { "url": "http://localhost:3000" }
   ],
+
+  "tags": [
+    { "name": "Sistemas", "description": "Gerenciamento de sistemas" },
+    { "name": "Permissões", "description": "Gerenciamento de permissões" },
+    { "name": "Grupos", "description": "Gerenciamento de grupos e vínculos" },
+    { "name": "Usuários", "description": "Gerenciamento de usuários e vínculos" },
+    { "name": "Autorização", "description": "Consulta de permissões" }
+  ],
+
   "paths": {
+
     "/sistemas": {
       "get": {
-        "summary": "Listar todos os sistemas",
+        "tags": ["Sistemas"],
+        "summary": "Listar sistemas",
         "responses": {
           "200": {
-            "description": "Lista de sistemas"
+            "description": "Lista de sistemas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Sistema" }
+                }
+              }
+            }
           }
         }
       },
+
       "post": {
-        "summary": "Criar um novo sistema",
+        "tags": ["Sistemas"],
+        "summary": "Criar novo sistema",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nome": {
-                    "type": "string",
-                    "example": "Sistema Financeiro"
-                  },
-                  "descricao": {
-                    "type": "string",
-                    "example": "Controle de pagamentos"
-                  }
-                }
-              }
+              "schema": { "$ref": "#/components/schemas/SistemaInput" }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Sistema criado com sucesso"
+            "description": "Sistema criado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Sistema" }
+              }
+            }
           }
         }
       }
     },
+
     "/sistemas/{id}": {
       "get": {
+        "tags": ["Sistemas"],
         "summary": "Buscar sistema por ID",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
         "responses": {
-          "200": {
-            "description": "Sistema encontrado"
-          },
-          "404": {
-            "description": "Sistema não encontrado"
-          }
+          "200": { "description": "Sistema encontrado" },
+          "404": { "description": "Sistema não encontrado" }
         }
       },
+
       "put": {
+        "tags": ["Sistemas"],
         "summary": "Atualizar sistema",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nome": {
-                    "type": "string"
-                  },
-                  "descricao": {
-                    "type": "string"
+              "schema": { "$ref": "#/components/schemas/SistemaInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Sistema atualizado" }
+        }
+      },
+
+      "delete": {
+        "tags": ["Sistemas"],
+        "summary": "Excluir sistema",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Sistema removido" }
+        }
+      }
+    },
+
+    "/permissoes": {
+      "get": {
+        "tags": ["Permissões"],
+        "summary": "Listar permissões",
+        "responses": {
+          "200": {
+            "description": "Lista de permissões",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Permissao" }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "post": {
+        "tags": ["Permissões"],
+        "summary": "Criar permissão",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PermissaoInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Permissão criada" }
+        }
+      }
+    },
+
+    "/grupos": {
+      "get": {
+        "tags": ["Grupos"],
+        "summary": "Listar grupos",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Grupo" }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "post": {
+        "tags": ["Grupos"],
+        "summary": "Criar grupo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GrupoInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Grupo criado" }
+        }
+      }
+    },
+
+    "/usuarios": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Listar usuários",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Usuario" }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "post": {
+        "tags": ["Usuários"],
+        "summary": "Criar usuário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UsuarioInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Usuário criado" }
+        }
+      }
+    },
+
+    "/usuarios/{usuario_id}/grupos/{grupo_id}": {
+      "post": {
+        "tags": ["Usuários"],
+        "summary": "Vincular usuário a grupo",
+        "parameters": [
+          { "name": "usuario_id", "in": "path", "required": true, "schema": { "type": "integer" } },
+          { "name": "grupo_id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Usuário vinculado ao grupo" }
+        }
+      }
+    },
+
+    "/grupos/{grupo_id}/permissoes/{permissao_id}": {
+      "post": {
+        "tags": ["Grupos"],
+        "summary": "Vincular permissão a grupo",
+        "parameters": [
+          { "name": "grupo_id", "in": "path", "required": true, "schema": { "type": "integer" } },
+          { "name": "permissao_id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Permissão vinculada" }
+        }
+      }
+    },
+
+    "/auth/permissoes/{usuario_id}": {
+      "get": {
+        "tags": ["Autorização"],
+        "summary": "Buscar permissões do usuário",
+        "parameters": [
+          { "name": "usuario_id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permissões do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "usuario_id": { "type": "integer" },
+                    "permissoes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PermissaoComSistema"
+                      }
+                    }
                   }
                 }
               }
             }
           }
-        },
-        "responses": {
-          "200": {
-            "description": "Sistema atualizado"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Deletar sistema",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Sistema removido"
-          }
         }
       }
+    }
+
+  },
+
+  "components": {
+    "schemas": {
+
+      "Sistema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" }
+        }
+      },
+
+      "SistemaInput": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string", "example": "Sistema Financeiro" },
+          "descricao": { "type": "string", "example": "Controle de pagamentos" }
+        }
+      },
+
+      "Permissao": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" },
+          "sistema_id": { "type": "integer" }
+        }
+      },
+
+      "PermissaoInput": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string", "example": "EDITAR_USUARIO" },
+          "descricao": { "type": "string", "example": "Permite editar usuários" },
+          "sistema_id": { "type": "integer", "example": 1 }
+        }
+      },
+
+      "PermissaoComSistema": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" },
+          "sistema": { "type": "string" }
+        }
+      },
+
+      "Grupo": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "nome": { "type": "string" },
+          "sistema_id": { "type": "integer" }
+        }
+      },
+
+      "GrupoInput": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string", "example": "Administradores" },
+          "sistema_id": { "type": "integer", "example": 1 }
+        }
+      },
+
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "nome": { "type": "string" },
+          "email": { "type": "string" }
+        }
+      },
+
+      "UsuarioInput": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string", "example": "Lucas" },
+          "email": { "type": "string", "example": "lucas@email.com" }
+        }
+      }
+
     }
   }
 }
