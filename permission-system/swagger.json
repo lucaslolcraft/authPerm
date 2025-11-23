@@ -3,7 +3,7 @@
   "info": {
     "title": "API - Sistema de Permissionamento",
     "version": "1.0.0",
-    "description": "API para gerenciamento de usuários, grupos, permissões e sistemas"
+    "description": "API para gerenciamento de usuários, grupos, permissões e controle de acesso"
   },
 
   "servers": [
@@ -11,11 +11,11 @@
   ],
 
   "tags": [
-    { "name": "Sistemas", "description": "Gerenciamento de sistemas" },
-    { "name": "Permissões", "description": "Gerenciamento de permissões" },
-    { "name": "Grupos", "description": "Gerenciamento de grupos e vínculos" },
-    { "name": "Usuários", "description": "Gerenciamento de usuários e vínculos" },
-    { "name": "Autorização", "description": "Consulta de permissões" }
+    { "name": "Sistemas" },
+    { "name": "Permissões" },
+    { "name": "Grupos" },
+    { "name": "Usuários" },
+    { "name": "Autorização" }
   ],
 
   "paths": {
@@ -29,6 +29,9 @@
             "description": "Lista de sistemas",
             "content": {
               "application/json": {
+                "example": [
+                  { "id": 1, "nome": "Financeiro", "descricao": "Sistema financeiro" }
+                ],
                 "schema": {
                   "type": "array",
                   "items": { "$ref": "#/components/schemas/Sistema" }
@@ -55,7 +58,7 @@
             "description": "Sistema criado",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Sistema" }
+                "example": { "id": 2, "nome": "RH", "descricao": "Sistema de RH" }
               }
             }
           }
@@ -67,9 +70,7 @@
       "get": {
         "tags": ["Sistemas"],
         "summary": "Buscar sistema por ID",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": {
           "200": { "description": "Sistema encontrado" },
           "404": { "description": "Sistema não encontrado" }
@@ -79,11 +80,8 @@
       "put": {
         "tags": ["Sistemas"],
         "summary": "Atualizar sistema",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/SistemaInput" }
@@ -98,9 +96,7 @@
       "delete": {
         "tags": ["Sistemas"],
         "summary": "Excluir sistema",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
         "responses": {
           "200": { "description": "Sistema removido" }
         }
@@ -113,9 +109,11 @@
         "summary": "Listar permissões",
         "responses": {
           "200": {
-            "description": "Lista de permissões",
             "content": {
               "application/json": {
+                "example": [
+                  { "id": 1, "nome": "VER_RELATORIO", "descricao": "Visualizar relatórios", "sistema_id": 1 }
+                ],
                 "schema": {
                   "type": "array",
                   "items": { "$ref": "#/components/schemas/Permissao" }
@@ -130,7 +128,6 @@
         "tags": ["Permissões"],
         "summary": "Criar permissão",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/PermissaoInput" }
@@ -143,6 +140,36 @@
       }
     },
 
+    "/permissoes/{id}": {
+      "get": {
+        "tags": ["Permissões"],
+        "summary": "Buscar permissão por ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Permissão encontrada" } }
+      },
+
+      "put": {
+        "tags": ["Permissões"],
+        "summary": "Atualizar permissão",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PermissaoInput" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Permissão atualizada" } }
+      },
+
+      "delete": {
+        "tags": ["Permissões"],
+        "summary": "Excluir permissão",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Permissão removida" } }
+      }
+    },
+
     "/grupos": {
       "get": {
         "tags": ["Grupos"],
@@ -151,6 +178,9 @@
           "200": {
             "content": {
               "application/json": {
+                "example": [
+                  { "id": 1, "nome": "Administradores", "sistema_id": 1 }
+                ],
                 "schema": {
                   "type": "array",
                   "items": { "$ref": "#/components/schemas/Grupo" }
@@ -165,16 +195,41 @@
         "tags": ["Grupos"],
         "summary": "Criar grupo",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/GrupoInput" }
             }
           }
         },
-        "responses": {
-          "201": { "description": "Grupo criado" }
-        }
+        "responses": { "201": { "description": "Grupo criado" } }
+      }
+    },
+
+    "/grupos/{id}": {
+      "get": {
+        "tags": ["Grupos"],
+        "summary": "Buscar grupo por ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Grupo encontrado" } }
+      },
+      "put": {
+        "tags": ["Grupos"],
+        "summary": "Atualizar grupo",
+        "parameters": [{ "name": "id", "in": "path", "required": true }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GrupoInput" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Grupo atualizado" } }
+      },
+      "delete": {
+        "tags": ["Grupos"],
+        "summary": "Excluir grupo",
+        "parameters": [{ "name": "id", "in": "path", "required": true }],
+        "responses": { "200": { "description": "Grupo removido" } }
       }
     },
 
@@ -186,6 +241,9 @@
           "200": {
             "content": {
               "application/json": {
+                "example": [
+                  { "id": 1, "nome": "Lucas", "email": "lucas@email.com" }
+                ],
                 "schema": {
                   "type": "array",
                   "items": { "$ref": "#/components/schemas/Usuario" }
@@ -200,16 +258,41 @@
         "tags": ["Usuários"],
         "summary": "Criar usuário",
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/UsuarioInput" }
             }
           }
         },
-        "responses": {
-          "201": { "description": "Usuário criado" }
-        }
+        "responses": { "201": { "description": "Usuário criado" } }
+      }
+    },
+
+    "/usuarios/{id}": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Buscar usuário por ID",
+        "parameters": [{ "name": "id", "in": "path", "required": true }],
+        "responses": { "200": { "description": "Usuário encontrado" } }
+      },
+      "put": {
+        "tags": ["Usuários"],
+        "summary": "Atualizar usuário",
+        "parameters": [{ "name": "id", "in": "path", "required": true }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UsuarioInput" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Usuário atualizado" } }
+      },
+      "delete": {
+        "tags": ["Usuários"],
+        "summary": "Excluir usuário",
+        "parameters": [{ "name": "id", "in": "path", "required": true }],
+        "responses": { "200": { "description": "Usuário removido" } }
       }
     },
 
@@ -218,12 +301,10 @@
         "tags": ["Usuários"],
         "summary": "Vincular usuário a grupo",
         "parameters": [
-          { "name": "usuario_id", "in": "path", "required": true, "schema": { "type": "integer" } },
-          { "name": "grupo_id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          { "name": "usuario_id", "in": "path", "required": true },
+          { "name": "grupo_id", "in": "path", "required": true }
         ],
-        "responses": {
-          "200": { "description": "Usuário vinculado ao grupo" }
-        }
+        "responses": { "200": { "description": "Usuário vinculado ao grupo" } }
       }
     },
 
@@ -232,12 +313,10 @@
         "tags": ["Grupos"],
         "summary": "Vincular permissão a grupo",
         "parameters": [
-          { "name": "grupo_id", "in": "path", "required": true, "schema": { "type": "integer" } },
-          { "name": "permissao_id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          { "name": "grupo_id", "in": "path", "required": true },
+          { "name": "permissao_id", "in": "path", "required": true }
         ],
-        "responses": {
-          "200": { "description": "Permissão vinculada" }
-        }
+        "responses": { "200": { "description": "Permissão vinculada ao grupo" } }
       }
     },
 
@@ -245,25 +324,20 @@
       "get": {
         "tags": ["Autorização"],
         "summary": "Buscar permissões do usuário",
-        "parameters": [
-          { "name": "usuario_id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
+        "parameters": [{ "name": "usuario_id", "in": "path", "required": true }],
         "responses": {
           "200": {
-            "description": "Permissões do usuário",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "usuario_id": { "type": "integer" },
-                    "permissoes": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/PermissaoComSistema"
-                      }
+                "example": {
+                  "usuario_id": 1,
+                  "permissoes": [
+                    {
+                      "nome": "VER_RELATORIO",
+                      "descricao": "Visualizar relatórios",
+                      "sistema": "Financeiro"
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -289,8 +363,8 @@
       "SistemaInput": {
         "type": "object",
         "properties": {
-          "nome": { "type": "string", "example": "Sistema Financeiro" },
-          "descricao": { "type": "string", "example": "Controle de pagamentos" }
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" }
         }
       },
 
@@ -307,18 +381,9 @@
       "PermissaoInput": {
         "type": "object",
         "properties": {
-          "nome": { "type": "string", "example": "EDITAR_USUARIO" },
-          "descricao": { "type": "string", "example": "Permite editar usuários" },
-          "sistema_id": { "type": "integer", "example": 1 }
-        }
-      },
-
-      "PermissaoComSistema": {
-        "type": "object",
-        "properties": {
           "nome": { "type": "string" },
           "descricao": { "type": "string" },
-          "sistema": { "type": "string" }
+          "sistema_id": { "type": "integer" }
         }
       },
 
@@ -334,8 +399,8 @@
       "GrupoInput": {
         "type": "object",
         "properties": {
-          "nome": { "type": "string", "example": "Administradores" },
-          "sistema_id": { "type": "integer", "example": 1 }
+          "nome": { "type": "string" },
+          "sistema_id": { "type": "integer" }
         }
       },
 
@@ -351,11 +416,10 @@
       "UsuarioInput": {
         "type": "object",
         "properties": {
-          "nome": { "type": "string", "example": "Lucas" },
-          "email": { "type": "string", "example": "lucas@email.com" }
+          "nome": { "type": "string" },
+          "email": { "type": "string" }
         }
       }
-
     }
   }
 }
